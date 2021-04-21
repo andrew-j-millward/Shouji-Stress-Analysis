@@ -42,7 +42,6 @@
 #include <time.h>
 #include <stdlib.h>
 #include <immintrin.h>
-#include <sys/types.h>
 
 /* to compile type the following 
 sudo ldconfig -v
@@ -90,7 +89,6 @@ int main(int argc, const char * const argv[]) {
         printf("Edit Distance \t CPU Time(seconds) \t Alignment_Needed \t Not_Needed \n");
 	printf("Threshold \n");
 	for (loopPar =0; loopPar<=10;loopPar++) {
-		printf("%d\n", loopPar);
 		ErrorThreshold=(loopPar*ReadLength)/100;
 		//printf("\n<-------------------Levenshtein Distance = %d------------------->\n", ErrorThreshold);
 
@@ -105,7 +103,7 @@ int main(int argc, const char * const argv[]) {
 		}
 		else {
 			for (i = 1; i <= atoi(argv[5]); i++) {
-				//read = getline(&line, &len, fp);
+				read = getline(&line, &len, fp);
 				j=1;
 				for (p = strtok(line, "\t"); p != NULL; p = strtok(NULL, "\t")) {
 					if (j==1){
