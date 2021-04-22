@@ -73,7 +73,7 @@ char* simulateGap(char ReadSeq[], double ErrorFrequency, int ReadLength) {
 
 int main(int argc, const char * const argv[]) {
 
-	if (argc!=6){
+	if (argc!=7){
 		printf("missing argument..\n./main [DebugMode] [GridSize] [ReadLength] [ReadFile] [# of reads]\n");
 		exit(-1);
 	}
@@ -81,6 +81,19 @@ int main(int argc, const char * const argv[]) {
 	int DebugMode=atoi(argv[1]);
 	int GridSize=atoi(argv[2]);
 	int ReadLength = atoi(argv[3]); 
+
+    /*
+     * Testing Schemes:
+     * 0 - No tests
+     * 1 - Erroneous Reads (Character Misreads)
+     * 2 - String Size Mismatch
+     * 3 - Gap Insertion Errors
+     * 4 - Erroneous Reads -> String Size Mismatch
+     * 5 - Erroneous Reads -> Gap Insertion Errors
+     * 6 - String Size Mismatch -> Gap Insertion Errors
+     * 7 - Erroneous Reads -> String Size Mismatch -> Gap Insertion Errors
+    */
+    int TestingScheme = atoi(argv[6]);
 
 	int n;
 	FILE * fp;
@@ -144,9 +157,17 @@ int main(int argc, const char * const argv[]) {
                         j=j+1;
                     }		  
 
-                    //strcpy(ReadSeq, simulateGap(ReadSeq, ErrorFrequency, ReadLength));
-                    strcpy(ReadSeq, simulateSizeMismatch(ReadSeq, ErrorFrequency, ReadLength));
-                    //strcpy(ReadSeq, simulateErrorRead(ReadSeq, ErrorFrequency, ReadLength));
+                    if (TestingScheme == 1 || TestingScheme == 4 || TestingScheme == 5 || TestingScheme == 7) {
+                        strcpy(ReadSeq, simulateErrorRead(ReadSeq, ErrorFrequency, ReadLength));
+                    }
+                    
+                    if (TestingScheme == 2 || TestingScheme == 4 || TestingScheme == 6 || TestingScheme == 7) {
+                        strcpy(ReadSeq, simulateSizeMismatch(ReadSeq, ErrorFrequency, ReadLength));
+                    }
+
+                    if (TestingScheme == 3 || TestingScheme == 5 || TestingScheme == 6 || TestingScheme == 7) {
+                        strcpy(ReadSeq, simulateGap(ReadSeq, ErrorFrequency, ReadLength));
+                    }
 
                     begin1 = clock();
                     Accepted1 = Shouji(ReadLength, RefSeq, ReadSeq, ErrorThreshold, GridSize, DebugMode);
