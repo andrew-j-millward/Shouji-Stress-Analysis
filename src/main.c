@@ -33,27 +33,26 @@ char* simulateErrorRead(char ReadSeq[], double ErrorFrequency, int ReadLength) {
 }
 
 char* simulateSizeMismatch(char ReadSeq[], double ErrorFrequency, int ReadLength) {
-    int rand_tmp = 0;
     int shift = ErrorFrequency*ReadLength;
-    //printf("Out1: %s %lf\n", ReadSeq, ErrorFrequency);
-    for (int i=0; i<ReadLength; i++) {
-        int rand_tmp = rand()%2; // Beginning or end
+    printf("Out1: %s %lf\n", ReadSeq, ErrorFrequency);
 
-        // Delete shift beginning characters (X)
-        if (rand_tmp == 0) {
-            for (int j=0; j<shift; j++) {
-                ReadSeq[j] = 'X';
-            }
-        }
+    int rand_tmp = rand()%2; // Beginning or end
 
-        // Delete shift end characters (X)
-        else if (rand_tmp == 1) {
-            for (int j=0; j<shift; j++) {
-                ReadSeq[ReadLength-j-1] = 'X';
-            }
+    // Delete shift beginning characters (X)
+    if (rand_tmp == 0) {
+        for (int i=0; i<shift; i++) {
+            ReadSeq[i] = 'X';
         }
     }
-    //printf("Out2: %s %lf %lf\n", ReadSeq, ErrorFrequency, rand_tmp);
+
+    // Delete shift end characters (X)
+    else if (rand_tmp == 1) {
+        for (int i=0; i<shift; i++) {
+            ReadSeq[ReadLength-i-1] = 'X';
+        }
+    }
+
+    printf("Out2: %s %lf %d\n", ReadSeq, ErrorFrequency, rand_tmp);
     return ReadSeq;
 }
 
