@@ -6,12 +6,12 @@
 #include <stdlib.h>
 #include <immintrin.h>
 
-char* simulateErrorRead(char ReadSeq[], double ReadErrorFrequency, int ReadLength) {
+char* simulateErrorRead(char ReadSeq[], double ErrorFrequency, int ReadLength) {
     double rand_tmp = 0;
-    //printf("Out1: %s %lf\n", ReadSeq, ReadErrorFrequency);
+    //printf("Out1: %s %lf\n", ReadSeq, ErrorFrequency);
     for (int i=0; i<ReadLength; i++) {
         double rand_tmp = ((double)(rand()%10000))/10000;
-        if (rand_tmp <= ReadErrorFrequency) {
+        if (rand_tmp <= ErrorFrequency) {
             int rand_adj = rand()%4;
             //printf("change %d %d %c\n", i, rand_adj, ReadSeq[i]);
             if (rand_adj == 0) {
@@ -28,7 +28,32 @@ char* simulateErrorRead(char ReadSeq[], double ReadErrorFrequency, int ReadLengt
             }
         }
     }
-    //printf("Out2: %s %lf %lf\n", ReadSeq, ReadErrorFrequency, rand_tmp);
+    //printf("Out2: %s %lf %lf\n", ReadSeq, ErrorFrequency, rand_tmp);
+    return ReadSeq;
+}
+
+char* simulateSizeMismatch(char ReadSeq[], double ErrorFrequency, int ReadLength) {
+    int rand_tmp = 0;
+    int shift = ErrorFrequency*ReadLength;
+    //printf("Out1: %s %lf\n", ReadSeq, ErrorFrequency);
+    for (int i=0; i<ReadLength; i++) {
+        int rand_tmp = rand()%2; // Beginning or end
+
+        // Delete shift beginning characters (X)
+        if (rand_tmp == 0) {
+            for (int j=0; j<shift; j++) {
+                ReadSeq[j] = 'X';
+            }
+        }
+
+        // Delete shift end characters (X)
+        else if (rand_tmp == 1) {
+            for (int j=0; j<shift; j++) {
+                ReadSeq[ReadLength-j-1] = 'X';
+            }
+        }
+    }
+    //printf("Out2: %s %lf %lf\n", ReadSeq, ErrorFrequency, rand_tmp);
     return ReadSeq;
 }
 
@@ -55,7 +80,7 @@ int main(int argc, const char * const argv[]) {
 	char RefSeq[ReadLength] ;
 	char ReadSeq[ReadLength];
 	int ErrorThreshold;
-    double ReadErrorFrequency;
+    double ErrorFrequency;
 	int Accepted1;
 	int FP1;
 	int FN1;
@@ -71,7 +96,7 @@ int main(int argc, const char * const argv[]) {
 	for (loopPar=0; loopPar<=10; loopPar++) {
         for (innerLoopPar=min_error_threshold; innerLoopPar<=max_error_threshold; innerLoopPar++) {
             ErrorThreshold=(loopPar*ReadLength)/100;
-            ReadErrorFrequency=(double)innerLoopPar/(double)100;
+            ErrorFrequency=(double)innerLoopPar/(double)100;
             //printf("\n<-------------------Levenshtein Distance = %d------------------->\n", ErrorThreshold);
 
             FP1=0;
@@ -105,7 +130,8 @@ int main(int argc, const char * const argv[]) {
                         j=j+1;
                     }		  
 
-                    strcpy(ReadSeq, simulateErrorRead(ReadSeq, ReadErrorFrequency, ReadLength));
+                    strcpy(ReadSeq, simulateSizeMismatch(ReadSeq, ErrorFrequency, ReadLength));
+                    //strcpy(ReadSeq, simulateErrorRead(ReadSeq, ErrorFrequency, ReadLength));
 
                     begin1 = clock();
                     Accepted1 = Shouji(ReadLength, RefSeq, ReadSeq, ErrorThreshold, GridSize, DebugMode);
