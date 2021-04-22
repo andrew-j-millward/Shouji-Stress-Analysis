@@ -34,7 +34,7 @@ char* simulateErrorRead(char ReadSeq[], double ErrorFrequency, int ReadLength) {
 
 char* simulateSizeMismatch(char ReadSeq[], double ErrorFrequency, int ReadLength) {
     int shift = ErrorFrequency*ReadLength;
-    printf("Out1: %s %lf\n", ReadSeq, ErrorFrequency);
+    //printf("Out1: %s %lf\n", ReadSeq, ErrorFrequency);
 
     int rand_tmp = rand()%2; // Beginning or end
 
@@ -52,7 +52,22 @@ char* simulateSizeMismatch(char ReadSeq[], double ErrorFrequency, int ReadLength
         }
     }
 
-    printf("Out2: %s %lf %d\n", ReadSeq, ErrorFrequency, rand_tmp);
+    //printf("Out2: %s %lf %d\n", ReadSeq, ErrorFrequency, rand_tmp);
+    return ReadSeq;
+}
+
+char* simulateGap(char ReadSeq[], double ErrorFrequency, int ReadLength) {
+    double rand_tmp = 0;
+    //printf("Out1: %s %lf\n", ReadSeq, ErrorFrequency);
+    for (int i=0; i<ReadLength; i++) {
+        double rand_tmp = ((double)(rand()%10000))/10000;
+        if (rand_tmp <= ErrorFrequency) {
+            int rand_adj = rand()%4;
+            //printf("change %d %d %c\n", i, rand_adj, ReadSeq[i]);
+            ReadSeq[i] = 'X';
+        }
+    }
+    //printf("Out2: %s %lf %lf\n", ReadSeq, ErrorFrequency, rand_tmp);
     return ReadSeq;
 }
 
@@ -129,6 +144,7 @@ int main(int argc, const char * const argv[]) {
                         j=j+1;
                     }		  
 
+                    //strcpy(ReadSeq, simulateGap(ReadSeq, ErrorFrequency, ReadLength));
                     strcpy(ReadSeq, simulateSizeMismatch(ReadSeq, ErrorFrequency, ReadLength));
                     //strcpy(ReadSeq, simulateErrorRead(ReadSeq, ErrorFrequency, ReadLength));
 
