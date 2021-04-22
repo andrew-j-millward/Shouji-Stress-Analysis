@@ -206,13 +206,13 @@ int Shouji(int ReadLength, const char RefSeq[], const char ReadSeq[], int ErrorT
 		// This is to reorder the bit-vector to match the same order of the neighborhood map
 		
 		if (DebugMode==1) {
-			printf("\nHamming \n");
+			//printf("\nHamming \n");
 			for (n = 0; n < (((2*ErrorThreshold)+1)*ReadLength); n++) {
-				if ( n % ReadLength == 0)
-					printf("\n");
-				printf("%d", HammingMask[n]  );
+				//if ( n % ReadLength == 0)
+					//printf("\n");
+				//printf("%d", HammingMask[n]  );
 			}
-			printf("\n\n\n\n");
+			//printf("\n\n\n\n");
 		}
 
 
@@ -233,14 +233,14 @@ int Shouji(int ReadLength, const char RefSeq[], const char ReadSeq[], int ErrorT
 					count = 0;
 					for (i1 = 0; i1 < GridSize; i1++) {
 						if (DebugMode==1) {
-							printf("%d", HammingMask[(i * ReadLength) + (GridIndex + i1)] );
+							//printf("%d", HammingMask[(i * ReadLength) + (GridIndex + i1)] );
 						}
 						if (HammingMask[(i * ReadLength) + (GridIndex + i1)] == 0) {
 							count++ ;
 						}
 					}
 					if (DebugMode==1) {
-						printf("\n");
+						//printf("\n");
 					}
 					//printf("count:%d \n", count);
 					if (count > MaxZeros) {

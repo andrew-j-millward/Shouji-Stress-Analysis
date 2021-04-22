@@ -6,14 +6,17 @@
 #include <stdlib.h>
 #include <immintrin.h>
 
-char* simulateErrorRead(char ReadSeq[], double ErrorFrequency, int ReadLength) {
+char* simulateErrorRead(char ReadSeq[], double ErrorFrequency, int ReadLength, int DebugMode) {
+    
+    if (DebugMode) {
+        printf("Simulating Randomized Read Errors:\nStart: \t%s\n", ReadSeq);
+    }
+    
     double rand_tmp = 0;
-    //printf("Out1: %s %lf\n", ReadSeq, ErrorFrequency);
     for (int i=0; i<ReadLength; i++) {
         double rand_tmp = ((double)(rand()%10000))/10000;
         if (rand_tmp <= ErrorFrequency) {
             int rand_adj = rand()%4;
-            //printf("change %d %d %c\n", i, rand_adj, ReadSeq[i]);
             if (rand_adj == 0) {
                 ReadSeq[i] = 'A';
             }
@@ -28,13 +31,21 @@ char* simulateErrorRead(char ReadSeq[], double ErrorFrequency, int ReadLength) {
             }
         }
     }
-    //printf("Out2: %s %lf %lf\n", ReadSeq, ErrorFrequency, rand_tmp);
+
+    if (DebugMode) {
+        printf("End: \t%s\n", ReadSeq);
+    }
+
     return ReadSeq;
 }
 
-char* simulateSizeMismatch(char ReadSeq[], double ErrorFrequency, int ReadLength) {
+char* simulateSizeMismatch(char ReadSeq[], double ErrorFrequency, int ReadLength, int DebugMode) {
+
+    if (DebugMode) {
+        printf("Simulating String Size Mismatch:\nStart: \t%s\n", ReadSeq);
+    }
+
     int shift = ErrorFrequency*ReadLength;
-    //printf("Out1: %s %lf\n", ReadSeq, ErrorFrequency);
 
     int rand_tmp = rand()%2; // Beginning or end
 
@@ -52,22 +63,32 @@ char* simulateSizeMismatch(char ReadSeq[], double ErrorFrequency, int ReadLength
         }
     }
 
-    //printf("Out2: %s %lf %d\n", ReadSeq, ErrorFrequency, rand_tmp);
+    if (DebugMode) {
+        printf("End: \t%s\n", ReadSeq);
+    }
+
     return ReadSeq;
 }
 
-char* simulateGap(char ReadSeq[], double ErrorFrequency, int ReadLength) {
+char* simulateGap(char ReadSeq[], double ErrorFrequency, int ReadLength, int DebugMode) {
+
+    if (DebugMode) {
+        printf("Simulating Gap Insertion for Unknown Characters:\nStart: \t%s\n", ReadSeq);
+    }
+
     double rand_tmp = 0;
-    //printf("Out1: %s %lf\n", ReadSeq, ErrorFrequency);
     for (int i=0; i<ReadLength; i++) {
         double rand_tmp = ((double)(rand()%10000))/10000;
         if (rand_tmp <= ErrorFrequency) {
             int rand_adj = rand()%4;
-            //printf("change %d %d %c\n", i, rand_adj, ReadSeq[i]);
             ReadSeq[i] = 'X';
         }
     }
-    //printf("Out2: %s %lf %lf\n", ReadSeq, ErrorFrequency, rand_tmp);
+
+    if (DebugMode) {
+        printf("End: \t%s\n", ReadSeq);
+    }
+    
     return ReadSeq;
 }
 
@@ -116,7 +137,7 @@ int main(int argc, const char * const argv[]) {
 	double time1;
 	double time_spent1;
     int min_error_threshold = 0; // Percent
-    int max_error_threshold = 5;
+    int max_error_threshold = 15;
 
         printf("Edit Distance \t Read Error \t CPU Time(seconds) \t Alignment_Needed \t Not_Needed \n");
 	printf("Threshold \t Frequency \n");
@@ -158,15 +179,15 @@ int main(int argc, const char * const argv[]) {
                     }		  
 
                     if (TestingScheme == 1 || TestingScheme == 4 || TestingScheme == 5 || TestingScheme == 7) {
-                        strcpy(ReadSeq, simulateErrorRead(ReadSeq, ErrorFrequency, ReadLength));
+                        strcpy(ReadSeq, simulateErrorRead(ReadSeq, ErrorFrequency, ReadLength, DebugMode));
                     }
                     
                     if (TestingScheme == 2 || TestingScheme == 4 || TestingScheme == 6 || TestingScheme == 7) {
-                        strcpy(ReadSeq, simulateSizeMismatch(ReadSeq, ErrorFrequency, ReadLength));
+                        strcpy(ReadSeq, simulateSizeMismatch(ReadSeq, ErrorFrequency, ReadLength, DebugMode));
                     }
 
                     if (TestingScheme == 3 || TestingScheme == 5 || TestingScheme == 6 || TestingScheme == 7) {
-                        strcpy(ReadSeq, simulateGap(ReadSeq, ErrorFrequency, ReadLength));
+                        strcpy(ReadSeq, simulateGap(ReadSeq, ErrorFrequency, ReadLength, DebugMode));
                     }
 
                     begin1 = clock();
