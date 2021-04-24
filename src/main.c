@@ -145,8 +145,8 @@ int main(int argc, const char * const argv[]) {
     int *baselineAcceptDict = (int *) calloc(NumberReads, sizeof(int));
     int *alternateAcceptDict = (int *) calloc(NumberReads, sizeof(int));
 
-    printf("Edit Distance \t Read Error \t CPU Time(seconds) \t Alignment_Needed \t Not_Needed \n");
-	printf("Threshold \t Frequency \n");
+    printf("Edit Distance \tRead Error \tCPU Time(seconds) \tAlignment_Needed \tNot_Needed \tCorrect \tIncorrect\n");
+	printf("Threshold \t Frequency \t\t\t\t\t\t\t\t\tAlignment \tAlignment \n");
 	for (loopPar=0; loopPar<=10; loopPar++) {
         for (innerLoopPar=min_error_threshold; innerLoopPar<=max_error_threshold; innerLoopPar++) {
             ErrorThreshold=(loopPar*ReadLength)/100;
@@ -235,10 +235,10 @@ int main(int argc, const char * const argv[]) {
                             rej_baseline++;
                         }
                     }
-                    printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t %d %d %d\n", ErrorThreshold, innerLoopPar, time_spent1, FP1,FN1, acc_baseline, rej_baseline);
+                    printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t %d \t\t%d \t\t%d\n", ErrorThreshold, innerLoopPar, time_spent1, FP1,FN1, acc_baseline, rej_baseline);
                 }
                 else {
-                    printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t %d\n", ErrorThreshold, innerLoopPar, time_spent1, FP1,FN1);
+                    printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t %d \t\t%d \t\t0\n", ErrorThreshold, innerLoopPar, time_spent1, FP1, FN1, NumberReads);
                 }
                 acc_baseline = 0;
                 rej_baseline = 0;
@@ -254,5 +254,7 @@ int main(int argc, const char * const argv[]) {
             }
         }
 	}
+    free(baselineAcceptDict);
+    free(alternateAcceptDict);
 	return 0;
 }
