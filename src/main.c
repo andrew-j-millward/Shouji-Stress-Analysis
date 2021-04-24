@@ -95,13 +95,14 @@ char* simulateGap(char ReadSeq[], double ErrorFrequency, int ReadLength, int Deb
 int main(int argc, const char * const argv[]) {
 
 	if (argc!=7){
-		printf("missing argument..\n./main [DebugMode] [GridSize] [ReadLength] [ReadFile] [# of reads]\n");
+		printf("missing argument..\n./main [DebugMode] [GridSize] [ReadLength] [ReadFile] [# of reads] [TestingScheme]\n");
 		exit(-1);
 	}
 
 	int DebugMode=atoi(argv[1]);
 	int GridSize=atoi(argv[2]);
 	int ReadLength = atoi(argv[3]); 
+    int NumberReads = atoi(argv[5]);
 
     /*
      * Testing Schemes:
@@ -138,8 +139,13 @@ int main(int argc, const char * const argv[]) {
 	double time_spent1;
     int min_error_threshold = 0; // Percent
     int max_error_threshold = 15;
+    int acc_baseline = 0;
+    int rej_baseline = 0;
 
-        printf("Edit Distance \t Read Error \t CPU Time(seconds) \t Alignment_Needed \t Not_Needed \n");
+    int *baselineAcceptDict = (int *) calloc(NumberReads, sizeof(int));
+    int *alternateAcceptDict = (int *) calloc(NumberReads, sizeof(int));
+
+    printf("Edit Distance \t Read Error \t CPU Time(seconds) \t Alignment_Needed \t Not_Needed \n");
 	printf("Threshold \t Frequency \n");
 	for (loopPar=0; loopPar<=10; loopPar++) {
         for (innerLoopPar=min_error_threshold; innerLoopPar<=max_error_threshold; innerLoopPar++) {
@@ -157,7 +163,7 @@ int main(int argc, const char * const argv[]) {
                 printf("Sorry, the file does not exist or you do not have access permission");
             }
             else {
-                for (i = 1; i <= atoi(argv[5]); i++) {
+                for (i = 1; i <= NumberReads; i++) {
                     read = getline(&line, &len, fp);
                     j=1;
                     for (p = strtok(line, "\t"); p != NULL; p = strtok(NULL, "\t")) {
@@ -198,13 +204,6 @@ int main(int argc, const char * const argv[]) {
                     }*/
                     end1 = clock();
 
-                    
-                    
-                    /////////////////////////////////////////////////////////////////////////////////////////////////
-                    /////////////////////////////////////////////////////////////////////////////////////////////////
-                    /////////////////////////////////////////////////////////////////////////////////////////////////
-
-
                     //NWAccepted = Accepted8;
 
                     if (Accepted1==0  ){//&& NWAccepted==1
@@ -216,15 +215,39 @@ int main(int argc, const char * const argv[]) {
                     }
 
                     time1 = time1 + (end1 - begin1);
+
+                    if (innerLoopPar == 0) {
+                        baselineAcceptDict[i] = Accepted1;
+                    }
+                    else {
+                        alternateAcceptDict[i] = Accepted1;
+                    }
                 }
 
                 time_spent1 = (double)time1 / CLOCKS_PER_SEC;
+
+                if (innerLoopPar != 0) {
+                    for (i=0; i<NumberReads; i++) {
+                        if(alternateAcceptDict[i] == baselineAcceptDict[i]) {
+                            acc_baseline++;
+                        }
+                        else {
+                            rej_baseline++;
+                        }
+                    }
+                    printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t %d %d %d\n", ErrorThreshold, innerLoopPar, time_spent1, FP1,FN1, acc_baseline, rej_baseline);
+                }
+                else {
+                    printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t %d\n", ErrorThreshold, innerLoopPar, time_spent1, FP1,FN1);
+                }
+                acc_baseline = 0;
+                rej_baseline = 0;
 
                 //printf("Fastest implementation of Myers’s bit-vector algorithm (Edlib 2017):\n");
                 //printf("CPU Time(seconds): %5.4f,    Accepted Mapping: %d,    Rejected Mapping: %d\n", time_spent8, FP8,FN8);
                 //printf("----------------------------------------------------------------- \n");
                 //printf("Filter Name \t    CPU Time(seconds) \t\t FPs# \t FNs# \n");
-                printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t %d\n", ErrorThreshold, innerLoopPar, time_spent1, FP1,FN1);
+                //printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t %d\n", ErrorThreshold, innerLoopPar, time_spent1, FP1,FN1);
 
 
                 fclose(fp);
