@@ -92,6 +92,79 @@ char* simulateGap(char ReadSeq[], double ErrorFrequency, int ReadLength, int Deb
     return ReadSeq;
 }
 
+char* simulateCharacterInsertion(char ReadSeq[], double ErrorFrequency, int ReadLength, int DebugMode) {
+
+    if (DebugMode) {
+        printf("Simulating Random Character Insertion:\nStart: \t%s\n", ReadSeq);
+    }
+
+    char tmpRead[ReadLength];
+    strcpy(tmpRead, ReadSeq);
+    int insertions = 0;
+
+    double rand_tmp = 0;
+    for (int i=0; i<ReadLength; i++) {
+        double rand_tmp = ((double)(rand()%10000))/10000;
+        if (rand_tmp <= ErrorFrequency) {
+            int rand_adj = rand()%4;
+            if (rand_adj == 0) {
+                ReadSeq[i] = 'A';
+            }
+            else if (rand_adj == 1) {
+                ReadSeq[i] = 'C';
+            }
+            else if (rand_adj == 2) {
+                ReadSeq[i] = 'G';
+            }
+            else if (rand_adj == 3) {
+                ReadSeq[i] = 'T';
+            }
+            insertions++;
+        }
+        else {
+            ReadSeq[i] = tmpRead[i-insertions];
+        }
+    }
+
+    if (DebugMode) {
+        printf("End: \t%s\n", ReadSeq);
+    }
+    
+    return ReadSeq;
+}
+
+char* simulateCharacterDeletion(char ReadSeq[], double ErrorFrequency, int ReadLength, int DebugMode) {
+
+    if (DebugMode) {
+        printf("Simulating Random Character Deletion:\nStart: \t%s\n", ReadSeq);
+    }
+
+    char tmpRead[ReadLength];
+    strcpy(tmpRead, ReadSeq);
+    int deletions = 0;
+
+    double rand_tmp = 0;
+    for (int i=0; i<ReadLength; i++) {
+        double rand_tmp = ((double)(rand()%10000))/10000;
+        if (rand_tmp <= ErrorFrequency) {
+            deletions++;
+        }
+        else {
+            ReadSeq[i-deletions] = tmpRead[i];
+        }
+    }
+
+    for (int i=0; i<deletions; i++) {
+        ReadSeq[ReadLength-deletions+i] = 'X';
+    }
+
+    if (DebugMode) {
+        printf("End: \t%s\n", ReadSeq);
+    }
+    
+    return ReadSeq;
+}
+
 int main(int argc, const char * const argv[]) {
 
 	if (argc!=7){
@@ -185,7 +258,7 @@ int main(int argc, const char * const argv[]) {
                         j=j+1;
                     }		  
 
-                    if (TestingScheme == 1 || TestingScheme == 4 || TestingScheme == 5 || TestingScheme == 7) {
+                    /*if (TestingScheme == 1 || TestingScheme == 4 || TestingScheme == 5 || TestingScheme == 7) {
                         strcpy(ReadSeq, simulateErrorRead(ReadSeq, ErrorFrequency, ReadLength, DebugMode));
                     }
                     
@@ -195,7 +268,9 @@ int main(int argc, const char * const argv[]) {
 
                     if (TestingScheme == 3 || TestingScheme == 5 || TestingScheme == 6 || TestingScheme == 7) {
                         strcpy(ReadSeq, simulateGap(ReadSeq, ErrorFrequency, ReadLength, DebugMode));
-                    }
+                    }*/
+
+                    strcpy(ReadSeq, simulateCharacterDeletion(ReadSeq, ErrorFrequency, ReadLength, DebugMode));
 
                     begin1 = clock();
                     Accepted1 = Shouji(ReadLength, RefSeq, ReadSeq, ErrorThreshold, GridSize, DebugMode);
