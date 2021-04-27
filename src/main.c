@@ -14,7 +14,7 @@ char* simulateErrorRead(char ReadSeq[], double ErrorFrequency, int ReadLength, i
     
     double rand_tmp = 0;
     for (int i=0; i<ReadLength; i++) {
-        double rand_tmp = ((double)(rand()%10000))/10000;
+        rand_tmp = ((double)(rand()%10000))/10000;
         if (rand_tmp <= ErrorFrequency) {
             int rand_adj = rand()%4;
             if (rand_adj == 0) {
@@ -78,7 +78,7 @@ char* simulateGap(char ReadSeq[], double ErrorFrequency, int ReadLength, int Deb
 
     double rand_tmp = 0;
     for (int i=0; i<ReadLength; i++) {
-        double rand_tmp = ((double)(rand()%10000))/10000;
+        rand_tmp = ((double)(rand()%10000))/10000;
         if (rand_tmp <= ErrorFrequency) {
             int rand_adj = rand()%4;
             ReadSeq[i] = 'X';
@@ -104,7 +104,7 @@ char* simulateCharacterInsertion(char ReadSeq[], double ErrorFrequency, int Read
 
     double rand_tmp = 0;
     for (int i=0; i<ReadLength; i++) {
-        double rand_tmp = ((double)(rand()%10000))/10000;
+        rand_tmp = ((double)(rand()%10000))/10000;
         if (rand_tmp <= ErrorFrequency) {
             int rand_adj = rand()%4;
             if (rand_adj == 0) {
@@ -145,7 +145,7 @@ char* simulateCharacterDeletion(char ReadSeq[], double ErrorFrequency, int ReadL
 
     double rand_tmp = 0;
     for (int i=0; i<ReadLength; i++) {
-        double rand_tmp = ((double)(rand()%10000))/10000;
+        rand_tmp = ((double)(rand()%10000))/10000;
         if (rand_tmp <= ErrorFrequency) {
             deletions++;
         }
@@ -179,14 +179,39 @@ int main(int argc, const char * const argv[]) {
 
     /*
      * Testing Schemes:
-     * 0 - No tests
-     * 1 - Erroneous Reads (Character Misreads)
-     * 2 - String Size Mismatch
-     * 3 - Gap Insertion Errors
-     * 4 - Erroneous Reads -> String Size Mismatch
-     * 5 - Erroneous Reads -> Gap Insertion Errors
-     * 6 - String Size Mismatch -> Gap Insertion Errors
-     * 7 - Erroneous Reads -> String Size Mismatch -> Gap Insertion Errors
+     * 0  - No tests
+     * 1  - Substitution Error
+     * 2  - Insertion Error
+     * 3  - Deletion Error
+     * 4  - String Size Mismatch
+     * 5  - Gap Insertion Errors
+     * 6  - Substitution Error -> Insertion Error
+     * 7  - Substitution Error -> Deletion Error
+     * 8  - Substitution Error -> String Size Mismatch
+     * 9  - Substitution Error -> Gap Insertion Errors
+     * 10 - Insertion Error -> Deletion Error
+     * 11 - Insertion Error -> String Size Mismatch
+     * 12 - Insertion Error -> Gap Insertion Errors
+     * 13 - Deletion Error -> String Size Mismatch
+     * 14 - Deletion Error -> Gap Insertion Errors
+     * 15 - String Size Mismatch -> Gap Insertion Errors
+     * 16 - Substitution Error -> Insertion Error -> Deletion Error
+     * 17 - Substitution Error -> Insertion Error -> String Size Mismatch
+     * 18 - Substitution Error -> Insertion Error -> Gap Insertion Errors
+     * 19 - Substitution Error -> Deletion Error -> String Size Mismatch
+     * 20 - Substitution Error -> Deletion Error -> Gap Insertion Errors
+     * 21 - Substitution Error -> String Size Mismatch -> Gap Insertion Errors
+     * 22 - Insertion Error -> Deletion Error -> String Size Mismatch
+     * 23 - Insertion Error -> Deletion Error -> Gap Insertion Errors
+     * 24 - Insertion Error -> String Size Mismatch -> Gap Insertion Errors
+     * 25 - Insertion Error -> Deletion Error -> String Size Mismatch
+     * 26 - Deletion Error -> String Size Mismatch -> Gap Insertion Errors
+     * 27 - Substitution Error -> Insertion Error -> Deletion Error -> String Size Mismatch
+     * 28 - Substitution Error -> Insertion Error -> Deletion Error -> Gap Insertion Errors
+     * 29 - Substitution Error -> Insertion Error -> String Size Mismatch -> Gap Insertion Errors
+     * 30 - Substitution Error -> Deletion Error -> String Size Mismatch -> Gap Insertion Errors
+     * 31 - Insertion Error -> Deletion Error -> String Size Mismatch -> Gap Insertion Errors
+     * 32 - Substitution Error -> Insertion Error -> Deletion Error -> String Size Mismatch -> Gap Insertion Errors
     */
     int TestingScheme = atoi(argv[6]);
 
@@ -214,6 +239,8 @@ int main(int argc, const char * const argv[]) {
     int max_error_threshold = 15;
     int acc_baseline = 0;
     int rej_baseline = 0;
+    int false_acc = 0;
+    int false_rej = 0;
     double fraction_correct = 0;
 
     int *baselineAcceptDict = (int *) calloc(NumberReads, sizeof(int));
@@ -258,19 +285,30 @@ int main(int argc, const char * const argv[]) {
                         j=j+1;
                     }		  
 
-                    /*if (TestingScheme == 1 || TestingScheme == 4 || TestingScheme == 5 || TestingScheme == 7) {
+                    if (TestingScheme == 1 || (TestingScheme >= 6 && TestingScheme <= 9) || (TestingScheme >= 16 && TestingScheme <= 21) || (TestingScheme >= 27 && TestingScheme <= 30) || TestingScheme == 32) {
                         strcpy(ReadSeq, simulateErrorRead(ReadSeq, ErrorFrequency, ReadLength, DebugMode));
                     }
                     
-                    if (TestingScheme == 2 || TestingScheme == 4 || TestingScheme == 6 || TestingScheme == 7) {
+                    if (TestingScheme == 2 || TestingScheme == 6 || (TestingScheme >= 10 && TestingScheme <= 12) || (TestingScheme >= 16 && TestingScheme <= 18) || (TestingScheme >= 22 && TestingScheme <= 25) || (TestingScheme >= 27 && TestingScheme <= 29) || TestingScheme == 31 || TestingScheme == 32) {
+                        strcpy(ReadSeq, simulateCharacterInsertion(ReadSeq, ErrorFrequency, ReadLength, DebugMode));
+                    }
+
+                    if (TestingScheme == 3 || TestingScheme == 7 || TestingScheme == 10 || TestingScheme == 13 || TestingScheme == 14 || TestingScheme == 16 || TestingScheme == 19 || TestingScheme == 20 || TestingScheme == 22 || TestingScheme == 23 || (TestingScheme >= 25 && TestingScheme <= 28) || (TestingScheme >= 30 && TestingScheme <= 32)) {
+                        strcpy(ReadSeq, simulateCharacterDeletion(ReadSeq, ErrorFrequency, ReadLength, DebugMode));
+                    }
+
+                    if (TestingScheme == 4 || TestingScheme == 8 || TestingScheme == 11 || TestingScheme == 13 || TestingScheme == 15 || TestingScheme == 17 || TestingScheme == 19 || TestingScheme == 21 || TestingScheme == 22 || (TestingScheme >= 24 && TestingScheme <= 27) || (TestingScheme >= 29 && TestingScheme <= 32)) {
                         strcpy(ReadSeq, simulateSizeMismatch(ReadSeq, ErrorFrequency, ReadLength, DebugMode));
                     }
 
-                    if (TestingScheme == 3 || TestingScheme == 5 || TestingScheme == 6 || TestingScheme == 7) {
+                    if (TestingScheme == 5 || TestingScheme == 9 || TestingScheme == 12 || TestingScheme == 14 || TestingScheme == 15 || TestingScheme == 18 || TestingScheme == 20 || TestingScheme == 21 || TestingScheme == 23 || TestingScheme == 24 || TestingScheme == 26 || (TestingScheme >= 28 && TestingScheme <= 32)) {
                         strcpy(ReadSeq, simulateGap(ReadSeq, ErrorFrequency, ReadLength, DebugMode));
-                    }*/
+                    }
 
-                    strcpy(ReadSeq, simulateCharacterDeletion(ReadSeq, ErrorFrequency, ReadLength, DebugMode));
+                    /*double rand11 = ((double)(rand()%3000))/3000;
+                    if(rand11 == 0) {
+                        printf("%s\n", ReadSeq);
+                    }*/
 
                     begin1 = clock();
                     Accepted1 = Shouji(ReadLength, RefSeq, ReadSeq, ErrorThreshold, GridSize, DebugMode);
@@ -307,7 +345,12 @@ int main(int argc, const char * const argv[]) {
                         if(alternateAcceptDict[i] == baselineAcceptDict[i]) {
                             acc_baseline++;
                         }
-                        else {
+                        else if(alternateAcceptDict[i] == 0 && baselineAcceptDict[i] == 1) {
+                            false_rej++;
+                            rej_baseline++;
+                        }
+                        else if(alternateAcceptDict[i] == 1 && baselineAcceptDict[i] == 0) {
+                            false_acc++;
                             rej_baseline++;
                         }
                     }
@@ -319,6 +362,8 @@ int main(int argc, const char * const argv[]) {
                 }
                 acc_baseline = 0;
                 rej_baseline = 0;
+                false_acc = 0;
+                false_rej = 0;
 
                 //printf("Fastest implementation of Myers’s bit-vector algorithm (Edlib 2017):\n");
                 //printf("CPU Time(seconds): %5.4f,    Accepted Mapping: %d,    Rejected Mapping: %d\n", time_spent8, FP8,FN8);
