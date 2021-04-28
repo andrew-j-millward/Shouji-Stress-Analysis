@@ -167,7 +167,7 @@ char* simulateCharacterDeletion(char ReadSeq[], double ErrorFrequency, int ReadL
 
 int main(int argc, const char * const argv[]) {
 
-	if (argc!=7){
+	if (argc!=8){
 		printf("missing argument..\n./main [DebugMode] [GridSize] [ReadLength] [ReadFile] [# of reads] [TestingScheme]\n");
 		exit(-1);
 	}
@@ -214,6 +214,13 @@ int main(int argc, const char * const argv[]) {
      * 32 - Substitution Error -> Insertion Error -> Deletion Error -> String Size Mismatch -> Gap Insertion Errors
     */
     int TestingScheme = atoi(argv[6]);
+
+    /*
+     * Output configuration:
+     * -1 - Report all outputs to CSV
+     * 0-25 - Report specific error threshold to CSV for various edit distances
+    */
+    int OutputConfig = atoi(argv[7]);
 
 	int n;
 	FILE * fp;
@@ -365,10 +372,15 @@ int main(int argc, const char * const argv[]) {
                     fraction_false_positive = (double)false_acc/NumberReads;
                     fraction_false_negative = (double)false_rej/NumberReads;
                     printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t %d \t\t%d \t\t%d \t\t%lf\t%lf\t%lf\n", ErrorThreshold, innerLoopPar, time_spent1, FP1,FN1, acc_baseline, rej_baseline, fraction_correct, fraction_false_positive, fraction_false_negative);
-                    fprintf(fp2, "%d,%d,%5.4f,%d,%d,%d,%d,%lf,%lf,%lf\n", ErrorThreshold, innerLoopPar, time_spent1, FP1,FN1, acc_baseline, rej_baseline, fraction_correct, fraction_false_positive, fraction_false_negative);
+                    if (OutputConfig == innerLoopPar || innerLoopPar == -1) {
+                        fprintf(fp2, "%d,%d,%5.4f,%d,%d,%d,%d,%lf,%lf,%lf\n", ErrorThreshold, innerLoopPar, time_spent1, FP1,FN1, acc_baseline, rej_baseline, fraction_correct, fraction_false_positive, fraction_false_negative);
+                    }
                 }
                 else {
                     printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t %d \t\t%d \t\t0 \t\t1.000000\t0.000000\t0.000000\n", ErrorThreshold, innerLoopPar, time_spent1, FP1, FN1, NumberReads);
+                    if (OutputConfig == innerLoopPar || innerLoopPar == -1) {
+                        fprintf(fp2, "%d,%d,%5.4f,%d,%d,%d,0,1.000000,0.000000,0.000000\n", ErrorThreshold, innerLoopPar, time_spent1, FP1, FN1, NumberReads);
+                    }
                 }
                 acc_baseline = 0;
                 rej_baseline = 0;
