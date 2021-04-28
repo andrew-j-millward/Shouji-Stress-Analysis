@@ -242,12 +242,19 @@ int main(int argc, const char * const argv[]) {
     int false_acc = 0;
     int false_rej = 0;
     double fraction_correct = 0;
+    double fraction_false_positive = 0;
+    double fraction_false_negative = 0;
 
     int *baselineAcceptDict = (int *) calloc(NumberReads, sizeof(int));
     int *alternateAcceptDict = (int *) calloc(NumberReads, sizeof(int));
 
-    printf("Edit Distance \tRead Error \tCPU Time(seconds) \tAlignment_Needed \tNot_Needed \tCorrect \tIncorrect \tFraction\n");
-	printf("Threshold \t Frequency \t\t\t\t\t\t\t\t\tAlignment \tAlignment \tCorrect\n");
+    FILE *fp2;
+    char *filename = "output.csv";
+    fp2 = fopen(filename, "w+");
+    fprintf(fp2,"Edit Distance Threshold,Read Error Frequency,CPU Time (seconds),Alignment_Needed,Not_Needed,Correct Alignment,Incorrect Alignment,Fraction Correct,Fraction False Positive,Fraction False Negative\n");
+
+    printf("Edit Distance \tRead Error \tCPU Time(seconds) \tAlignment_Needed \tNot_Needed \tCorrect \tIncorrect \tFraction \tFraction \tFraction\n");
+	printf("Threshold \tFrequency \t\t\t\t\t\t\t\t\tAlignment \tAlignment \tCorrect \tFalse Positive \tFalse Negative\n");
 	for (loopPar=0; loopPar<=10; loopPar++) {
         for (innerLoopPar=min_error_threshold; innerLoopPar<=max_error_threshold; innerLoopPar++) {
             ErrorThreshold=(loopPar*ReadLength)/100;
@@ -355,10 +362,13 @@ int main(int argc, const char * const argv[]) {
                         }
                     }
                     fraction_correct = (double)acc_baseline/NumberReads; 
-                    printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t %d \t\t%d \t\t%d \t\t%lf\n", ErrorThreshold, innerLoopPar, time_spent1, FP1,FN1, acc_baseline, rej_baseline, fraction_correct);
+                    fraction_false_positive = (double)false_acc/NumberReads;
+                    fraction_false_negative = (double)false_rej/NumberReads;
+                    printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t %d \t\t%d \t\t%d \t\t%lf\t%lf\t%lf\n", ErrorThreshold, innerLoopPar, time_spent1, FP1,FN1, acc_baseline, rej_baseline, fraction_correct, fraction_false_positive, fraction_false_negative);
+                    fprintf(fp2, "%d,%d,%5.4f,%d,%d,%d,%d,%lf,%lf,%lf\n", ErrorThreshold, innerLoopPar, time_spent1, FP1,FN1, acc_baseline, rej_baseline, fraction_correct, fraction_false_positive, fraction_false_negative);
                 }
                 else {
-                    printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t %d \t\t%d \t\t0 \t\t1.000000\n", ErrorThreshold, innerLoopPar, time_spent1, FP1, FN1, NumberReads);
+                    printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t %d \t\t%d \t\t0 \t\t1.000000\t0.000000\t0.000000\n", ErrorThreshold, innerLoopPar, time_spent1, FP1, FN1, NumberReads);
                 }
                 acc_baseline = 0;
                 rej_baseline = 0;
@@ -376,6 +386,7 @@ int main(int argc, const char * const argv[]) {
             }
         }
 	}
+    fclose(fp2);
     free(baselineAcceptDict);
     free(alternateAcceptDict);
 	return 0;
