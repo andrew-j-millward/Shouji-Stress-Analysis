@@ -236,7 +236,7 @@ int main(int argc, const char * const argv[]) {
 	double time1;
 	double time_spent1;
     int min_error_threshold = 0; // Percent
-    int max_error_threshold = 15;
+    int max_error_threshold = 25;
     int acc_baseline = 0;
     int rej_baseline = 0;
     int false_acc = 0;
@@ -258,7 +258,7 @@ int main(int argc, const char * const argv[]) {
 	for (loopPar=0; loopPar<=10; loopPar++) {
         for (innerLoopPar=min_error_threshold; innerLoopPar<=max_error_threshold; innerLoopPar++) {
             ErrorThreshold=(loopPar*ReadLength)/100;
-            ErrorFrequency=(double)innerLoopPar/(double)100;
+            ErrorFrequency=(double)innerLoopPar/(double)1000;
             //printf("\n<-------------------Levenshtein Distance = %d------------------->\n", ErrorThreshold);
 
             FP1=0;
