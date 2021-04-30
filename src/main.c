@@ -45,19 +45,27 @@ char* simulateSizeMismatch(char ReadSeq[], double ErrorFrequency, int ReadLength
         printf("Simulating String Size Mismatch:\nStart: \t%s\n", ReadSeq);
     }
 
-    int shift = ErrorFrequency*ReadLength;
+    int shift = ErrorFrequency*ReadLength*10;
 
-    int rand_tmp = rand()%2; // Beginning or end
+    int rand_tmp_side = rand()%2; // Beginning or end
+    //double rand_tmp = ((double)(rand()%10000)+1)/10000;
+    //printf("%lf %lf %d\n", rand_tmp, ErrorFrequency, ((int)(ErrorFrequency*10000))/((int)(rand_tmp*10000)));
+
+    //int shift = ((int)(ErrorFrequency*10000))/((int)(rand_tmp*10000));
+
+    if (shift > ReadLength/2) {
+        shift = ReadLength/2;
+    }
 
     // Delete shift beginning characters (X)
-    if (rand_tmp == 0) {
+    if (rand_tmp_side == 0) {
         for (int i=0; i<shift; i++) {
             ReadSeq[i] = 'X';
         }
     }
 
     // Delete shift end characters (X)
-    else if (rand_tmp == 1) {
+    else if (rand_tmp_side == 1) {
         for (int i=0; i<shift; i++) {
             ReadSeq[ReadLength-i-1] = 'X';
         }
@@ -168,7 +176,7 @@ char* simulateCharacterDeletion(char ReadSeq[], double ErrorFrequency, int ReadL
 int main(int argc, const char * const argv[]) {
 
 	if (argc!=8){
-		printf("missing argument..\n./main [DebugMode] [GridSize] [ReadLength] [ReadFile] [# of reads] [TestingScheme]\n");
+		printf("missing argument..\n./main [DebugMode] [GridSize] [ReadLength] [ReadFile] [# of reads] [TestingScheme] [OutputConfig]\n");
 		exit(-1);
 	}
 
@@ -243,7 +251,7 @@ int main(int argc, const char * const argv[]) {
 	double time1;
 	double time_spent1;
     int min_error_threshold = 0; // Percent
-    int max_error_threshold = 25;
+    int max_error_threshold = 250;
     int acc_baseline = 0;
     int rej_baseline = 0;
     int false_acc = 0;
@@ -371,14 +379,14 @@ int main(int argc, const char * const argv[]) {
                     fraction_correct = (double)acc_baseline/NumberReads; 
                     fraction_false_positive = (double)false_acc/NumberReads;
                     fraction_false_negative = (double)false_rej/NumberReads;
-                    printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t %d \t\t%d \t\t%d \t\t%lf\t%lf\t%lf\n", ErrorThreshold, innerLoopPar, time_spent1, FP1,FN1, acc_baseline, rej_baseline, fraction_correct, fraction_false_positive, fraction_false_negative);
-                    if (OutputConfig == innerLoopPar || innerLoopPar == -1) {
+                    printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t%d\t\t%d \t\t%d \t\t%lf\t%lf\t%lf\n", ErrorThreshold, innerLoopPar, time_spent1, FP1,FN1, acc_baseline, rej_baseline, fraction_correct, fraction_false_positive, fraction_false_negative);
+                    if (OutputConfig == innerLoopPar || OutputConfig == -1) {
                         fprintf(fp2, "%d,%d,%5.4f,%d,%d,%d,%d,%lf,%lf,%lf\n", ErrorThreshold, innerLoopPar, time_spent1, FP1,FN1, acc_baseline, rej_baseline, fraction_correct, fraction_false_positive, fraction_false_negative);
                     }
                 }
                 else {
-                    printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t %d \t\t%d \t\t0 \t\t1.000000\t0.000000\t0.000000\n", ErrorThreshold, innerLoopPar, time_spent1, FP1, FN1, NumberReads);
-                    if (OutputConfig == innerLoopPar || innerLoopPar == -1) {
+                    printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t%d\t\t%d \t\t0 \t\t1.000000\t0.000000\t0.000000\n", ErrorThreshold, innerLoopPar, time_spent1, FP1, FN1, NumberReads);
+                    if (OutputConfig == innerLoopPar || OutputConfig == -1) {
                         fprintf(fp2, "%d,%d,%5.4f,%d,%d,%d,0,1.000000,0.000000,0.000000\n", ErrorThreshold, innerLoopPar, time_spent1, FP1, FN1, NumberReads);
                     }
                 }
