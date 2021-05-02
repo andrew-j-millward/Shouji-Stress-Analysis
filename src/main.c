@@ -251,7 +251,9 @@ int main(int argc, const char * const argv[]) {
 	double time1;
 	double time_spent1;
     int min_error_threshold = 0; // Percent
-    int max_error_threshold = 250;
+    int max_error_threshold = 25;
+    int acc_count = 0;
+    int rej_count = 0;
     int acc_baseline = 0;
     int rej_baseline = 0;
     int false_acc = 0;
@@ -363,6 +365,8 @@ int main(int argc, const char * const argv[]) {
                 time_spent1 = (double)time1 / CLOCKS_PER_SEC;
 
                 if (innerLoopPar != 0) {
+                    acc_count = 0;
+                    rej_count = 0;
                     for (i=0; i<NumberReads; i++) {
                         if(alternateAcceptDict[i] == baselineAcceptDict[i]) {
                             acc_baseline++;
@@ -375,13 +379,31 @@ int main(int argc, const char * const argv[]) {
                             false_acc++;
                             rej_baseline++;
                         }
+
+                        if (alternateAcceptDict[i] == 0) {
+                            rej_count++;
+                        }
+                        else {
+                            acc_count++;
+                        }
                     }
                     fraction_correct = (double)acc_baseline/NumberReads; 
-                    fraction_false_positive = (double)false_acc/NumberReads;
-                    fraction_false_negative = (double)false_rej/NumberReads;
+                    if (acc_count != 0) {
+                        fraction_false_positive = (double)false_acc/acc_count;
+                    }
+                    else {
+                        fraction_false_positive = (double)0;
+                    }
+                    if (rej_count != 0) {
+                        fraction_false_negative = (double)false_rej/rej_count;
+                    }
+                    else {
+                        fraction_false_negative = (double)0;
+                    }
                     printf(" %d \t\t %d \t\t %5.4f \t %10d \t\t\t%d\t\t%d \t\t%d \t\t%lf\t%lf\t%lf\n", ErrorThreshold, innerLoopPar, time_spent1, FP1,FN1, acc_baseline, rej_baseline, fraction_correct, fraction_false_positive, fraction_false_negative);
                     if (OutputConfig == innerLoopPar || OutputConfig == -1) {
                         fprintf(fp2, "%d,%d,%5.4f,%d,%d,%d,%d,%lf,%lf,%lf\n", ErrorThreshold, innerLoopPar, time_spent1, FP1,FN1, acc_baseline, rej_baseline, fraction_correct, fraction_false_positive, fraction_false_negative);
+                        //printf("%lf, %d, %d\n", (double)false_acc/acc_count, false_acc, acc_count);
                     }
                 }
                 else {
