@@ -1,6 +1,8 @@
 # Shouji: a fast and efficient pre-alignment filter for sequence alignment
 Shouji is fast and accurate pre-alignment filter for banded sequence alignment calculation. It is named after a traditional Japanese door that is designed to slide open [http://www.aisf.or.jp/~jaanus/deta/s/shouji.htm]. This project revolves around testing various edge cases of Shouji and assessing the algorithm's effectiveness in those situations.
 
+Original GitHub repository used for testing: https://github.com/CMU-SAFARI/Shouji
+
 ## Citation:
 Alser, M., Hassan, H., Kumar, A., Mutlu, O., and Alkan, C.Shouji: a fast and efficient pre-alignment filter for sequence alignment. Bioinformatics 35, 21 (03 2019), 4255–4263.
 
